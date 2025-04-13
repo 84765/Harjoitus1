@@ -2,6 +2,8 @@
 //https://codedamn.com/news/c/malloc-in-c
 //https://www.youtube.com/watch?v=PtSHcou0WIs
 //https://linuxhint.com/read-lines-stdin-c-programming/
+//https://www.geeksforgeeks.org/size_t-data-type-c-language/
+//https://jameshfisher.com/2017/02/22/ssize_t/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,34 +18,40 @@ char *reverse(char *string);
 
 int main(int argc, char *argv[]) {
     FILE *inputFile;
-    FILE *ouputFile;
+    FILE *outputFile;
 
     if (argc > 3) {
-        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+        fprintf(stderr, "usage: reverse <input> <output>\n");
         exit(1);
     }
 
     if (argc == 3) {
-        if ((inputFile = fopen(argv[1], "r")) == NULL) {
-            perror("Open file failed, stop");
-            exit(1);
-        } 
-    
-        if ((ouputFile = fopen(argv[2], "w")) == NULL) {
-            perror("Open file failed, stop");
+
+        if (strcmp(argv[1], argv[2]) == 0) {
+            fprintf(stderr, "Input and output file must differ.\n");
             exit(1);
         }
 
-        readLinesAndWrite(inputFile, ouputFile);
+        if ((inputFile = fopen(argv[1], "r")) == NULL) {
+            fprintf(stderr, "error: cannot open file '%s'\n", argv[1]);
+            exit(1);    
+        } 
+    
+        if ((outputFile = fopen(argv[2], "w")) == NULL) {
+            fprintf(stderr, "error: cannot open file '%s'\n", argv[2]);
+            exit(1);
+        }
+
+        readLinesAndWrite(inputFile, outputFile);
 
         fclose(inputFile);
-        fclose(ouputFile);
+        fclose(outputFile);
     }
 
     if (argc == 2) {
         if ((inputFile = fopen(argv[1], "r")) == NULL) {
-            perror("Open file failed, stop");
-            exit(1);
+            fprintf(stderr, "error: cannot open file '%s'\n", argv[1]);
+            exit(1); 
         } 
 
         readLinesAndPrint(inputFile);
@@ -60,33 +68,70 @@ int main(int argc, char *argv[]) {
 }
 
 void readLinesAndWrite(FILE *inputFile, FILE *outputFile) {
-    char line[200];
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
 
-    char *stor[200];
+    char **stor = malloc(10 * sizeof(char *));
     int count = 0;
+    int capacity = 10;
 
-    while(fgets(line, sizeof(line), inputFile) != NULL) {
+    if (stor == NULL) {
+        fprintf(stderr, "malloc failed\n");
+        exit(1);
+    }
+
+    while ((read = getline(&line, &len, inputFile)) != -1) {
+        if (count >= capacity) {
+            capacity *= 2;
+            stor = realloc(stor, capacity * sizeof(char *));
+            if (stor == NULL) {
+                fprintf(stderr, "realloc failed\n");
+                exit(1);
+            }
+        }
+
         stor[count] = strdup(line);
         count++;
-    } 
+    }
 
     for (int i = count - 1; i >= 0; i--) {
         fprintf(outputFile, "%s", stor[i]);
 
         free(stor[i]);
     }
+
+    free(stor);
+    free(line);
 }
 
 void readLinesAndPrint(FILE *inputFile) {
-    char line[200];
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
 
-    char *stor[200];
+    char **stor = malloc(10 * sizeof(char *));
     int count = 0;
+    int capacity = 10;
 
-    while(fgets(line, sizeof(line), inputFile) != NULL) {
+    if (stor == NULL) {
+        fprintf(stderr, "malloc failed\n");
+        exit(1);
+    }
+
+    while ((read = getline(&line, &len, inputFile)) != -1) {
+        if (count >= capacity) {
+            capacity *= 2;
+            stor = realloc(stor, capacity * sizeof(char *));
+            if (stor == NULL) {
+                fprintf(stderr, "realloc failed\n");
+                exit(1);
+            }
+        }
+
         stor[count] = strdup(line);
         count++;
-    } 
+    }
 
     for (int i = count - 1; i >= 0; i--) {
         printf("%s", stor[i]);
