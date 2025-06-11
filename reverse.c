@@ -1,5 +1,7 @@
 //Creators: Annika Hovilehto, Irem Yasar
 
+// AI statement: ChatGpt was used to help explain errors and code, also help translation. 
+
 // Sources:
 // https://codedamn.com/news/c/malloc-in-c
 // https://www.youtube.com/watch?v=PtSHcou0WIs
