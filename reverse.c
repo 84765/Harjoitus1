@@ -30,8 +30,10 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    // If use two arguments, read from input file and write to output file.
     if (argc == 3) {
 
+        // Check if input and output files are the same
         if (strcmp(argv[1], argv[2]) == 0) {
             fprintf(stderr, "Input and output file must differ.\n");
             exit(1);
@@ -53,6 +55,7 @@ int main(int argc, char *argv[]) {
         fclose(outputFile);
     }
 
+    // If use one argument, read from input file and print to standard output.
     if (argc == 2) {
         if ((inputFile = fopen(argv[1], "r")) == NULL) {
             fprintf(stderr, "error: cannot open file '%s'\n", argv[1]);
@@ -64,6 +67,7 @@ int main(int argc, char *argv[]) {
         fclose(inputFile);
     }
 
+    // If no arguments, read from standard input until "exit" is entered.
     if (argc == 1) {
         linesFromStdin();
         exit(1);
@@ -87,6 +91,7 @@ void readLinesAndWrite(FILE *inputFile, FILE *outputFile) {
         exit(1);
     }
 
+    // Read lines from the input file
     while ((read = getline(&line, &len, inputFile)) != -1) {
         if (count >= capacity) {
             capacity *= 2;
@@ -101,6 +106,7 @@ void readLinesAndWrite(FILE *inputFile, FILE *outputFile) {
         count++;
     }
 
+    // Reverse the lines and write them to the output file
     for (int i = count - 1; i >= 0; i--) {
         fprintf(outputFile, "%s", stor[i]);
 
@@ -121,11 +127,13 @@ void readLinesAndPrint(FILE *inputFile) {
     int count = 0;
     int capacity = 10;
 
+    // Check if memory allocation was successful
     if (stor == NULL) {
         fprintf(stderr, "malloc failed\n");
         exit(1);
     }
 
+    // Read lines from the input file
     while ((read = getline(&line, &len, inputFile)) != -1) {
         if (count >= capacity) {
             capacity *= 2;
@@ -140,6 +148,7 @@ void readLinesAndPrint(FILE *inputFile) {
         count++;
     }
 
+    // Reverse the lines and print them to standard output
     for (int i = count - 1; i >= 0; i--) {
         printf("%s", stor[i]);
 
@@ -147,7 +156,7 @@ void readLinesAndPrint(FILE *inputFile) {
     }
 }
 
-// Frees the allocated memory for the lines and the line buffer.
+// Reads lines from standard input until "exit" is entered, reverses each line, and prints it to standard output.
 void linesFromStdin() {
     char *line = NULL;
     size_t len = 0;
@@ -155,6 +164,7 @@ void linesFromStdin() {
 
     printf("Write, exit to stop.\n");
 
+    // Read lines from standard input until "exit" is entered
     while ((linesSize = getline(&line, &len, stdin)) != -1) {
         line[strcspn(line, "\n")] = '\0';
 
@@ -168,11 +178,13 @@ void linesFromStdin() {
     free(line);
 }
 
+// Reverses a string in place and returns the reversed string.
 char *reverse(char *string) {
     int length = strlen(string);
     int middle = length / 2;
     char temp;
 
+    // Swap characters from the start and end of the string until the middle is reached
     for (int i = 0; i < middle; i++) {
         temp = string[i];
         string[i] = string[length - i - 1];
